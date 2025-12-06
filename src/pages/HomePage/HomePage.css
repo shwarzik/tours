@@ -1,0 +1,16 @@
+.home-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.home-page__title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.home-page__content {
+  margin-top: 24px;
+}

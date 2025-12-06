@@ -1,0 +1,35 @@
+.button {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.button--primary {
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: #0066cc;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.button--primary:hover:not(:disabled) {
+  background: #0052a3;
+}
+
+.button--primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.button--icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}

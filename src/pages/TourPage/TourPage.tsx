@@ -3,5 +3,5 @@ export function TourPage() {
     <div>
       <h1>Welcome to the Tour Page</h1>
     </div>
-  )
+  );
 }

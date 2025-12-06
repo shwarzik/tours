@@ -1,0 +1,20 @@
+.search-form {
+  display: flex;
+  gap: 12px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  align-items: flex-end;
+}
+
+.search-form__input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+@media (max-width: 500px) {
+  .search-form {
+    flex-direction: column;
+  }
+}
