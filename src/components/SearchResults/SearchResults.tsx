@@ -1,20 +1,21 @@
 import { ResultMessage, Loader } from "@/components";
+import { HotelOffer } from "@/types/location";
 import { InfoIcon, ErrorIcon } from "@/icons";
+import { TourCard } from "../TourCard/TourCard";
+import { getPluralForm } from "@/utils";
 
 import "./SearchResults.scss";
-import { PricesMap } from "@/types/api";
 
 type SearchResultsProps = {
-  prices: PricesMap | null;
+  offers: HotelOffer[] | null;
   loading: boolean;
   error: Error | null;
 };
 
-export function SearchResults({ prices, loading, error }: SearchResultsProps) {
-  const resultPrices = prices ? Object.values(prices.prices) : [];
+export function SearchResults({ offers, loading, error }: SearchResultsProps) {
   if (loading) {
     return (
-      <div className="results">
+      <div className="results-message-wrapper">
         <Loader message="Шукаємо найкращі пропозиції..." />
       </div>
     );
@@ -22,15 +23,15 @@ export function SearchResults({ prices, loading, error }: SearchResultsProps) {
 
   if (error) {
     return (
-      <div className="results">
+      <div className="results-message-wrapper">
         <ResultMessage icon={<ErrorIcon size={50} color="#d32f2f" />} title="Помилка" message={error.message} />
       </div>
     );
   }
 
-  if (prices && resultPrices.length === 0) {
+  if (offers && offers.length === 0) {
     return (
-      <div className="results">
+      <div className="results-message-wrapper">
         <ResultMessage
           icon={<InfoIcon size={50} color="#ffb116" />}
           title="Результати відсутні"
@@ -40,14 +41,22 @@ export function SearchResults({ prices, loading, error }: SearchResultsProps) {
     );
   }
 
+  if (!offers) {
+    return null;
+  }
+
+  const pruralForm = getPluralForm(offers.length, "тур", "тури", "турів");
+
   return (
     <div className="results">
-      {resultPrices.length > 0 && (
-        <div className="search-results">
-          <h2>Результати пошуку:</h2>
-          <pre>{JSON.stringify(prices, null, 2)}</pre>
-        </div>
-      )}
+      <h2 className="results__title">
+        Знайдено {offers.length} {pruralForm}
+      </h2>
+      <div className="results__grid">
+        {offers.map((offer) => (
+          <TourCard key={offer.id} tour={offer} />
+        ))}
+      </div>
     </div>
   );
 }

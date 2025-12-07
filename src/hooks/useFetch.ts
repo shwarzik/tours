@@ -2,6 +2,11 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 const queryCache = new Map<string, { data: unknown; timestamp: number }>();
 
+export function getCachedQuery<T>(key: string): T | null {
+  const entry = queryCache.get(key);
+  return entry ? (entry.data as T) : null;
+}
+
 interface QueryOptions<T> {
   key: string;
   queryFn: () => Promise<T>;

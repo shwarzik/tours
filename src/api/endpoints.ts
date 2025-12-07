@@ -3,8 +3,9 @@ import {
   searchGeo,
   startSearchPrices as fetchStartSearchPrices,
   getSearchPrices,
+  getHotels as getHotelsAPI,
 } from "./api";
-import type { GeoEntity } from "@/types/api";
+import type { GeoEntity, HotelsMap, PricesMap, StartSearchResponse } from "@/types/api";
 import { rethrowResponseError } from "@/utils";
 
 export const getCountries = async () => {
@@ -29,10 +30,10 @@ export const getSearch = async (query: string) => {
   }
 };
 
-export const getStartSearchPrices = async (countryID: string) => {
+export const getStartSearchPrices = async (countryID: string): Promise<{ prices: PricesMap; hotels: HotelsMap }> => {
   try {
     const responseToken = await fetchStartSearchPrices(countryID);
-    const tokenData = await responseToken.json();
+    const tokenData: StartSearchResponse = await responseToken.json();
     const waitMs = new Date(tokenData.waitUntil).getTime() - Date.now();
 
     if (waitMs > 0) {
@@ -40,9 +41,14 @@ export const getStartSearchPrices = async (countryID: string) => {
     }
 
     const responsePrices = await getSearchPrices(tokenData.token);
-    const pricesData = await responsePrices.json();
-    return pricesData;
+    const responseHotels = await getHotelsAPI(countryID);
+    const pricesData: { prices: PricesMap } = await responsePrices.json();
+    const hotelsData: HotelsMap = await responseHotels.json();
+
+    return { prices: pricesData.prices, hotels: hotelsData };
   } catch (error) {
     await rethrowResponseError(error, "Failed to load start search tokens.");
+    // rethrowResponseError always throws; this return satisfies TypeScript
+    throw new Error("Unreachable");
   }
 };

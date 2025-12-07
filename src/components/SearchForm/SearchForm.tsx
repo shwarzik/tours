@@ -49,11 +49,13 @@ export function SearchForm({
     setIsDropdownOpen(false);
   };
 
-  const matchedItems = findMatch(searchData, inputValue);
+  const matchedItems = findMatch<GeoEntity>(searchData ?? null, inputValue);
 
   const shouldShowAllCountries = !isGreaterThanTwoChars || Boolean(countriesData?.[selectedItem.itemId]);
 
-  const dropdownItems = shouldShowAllCountries ? Object.values(countriesData ?? {}) : Object.values(matchedItems);
+  const dropdownItems: GeoEntity[] = shouldShowAllCountries
+    ? Object.values(countriesData ?? {})
+    : matchedItems;
   const isLoading = isCountriesLoading || isSearchLoading;
   const phase = isLoading ? "loading" : dropdownItems.length === 0 ? "empty" : "done";
 

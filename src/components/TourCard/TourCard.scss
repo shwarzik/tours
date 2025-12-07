@@ -1,0 +1,108 @@
+.tour-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s, transform 0.2s;
+  min-width: 250px;
+  max-width: 315px;
+
+  &:not(.tour-card--detail):hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &--detail {
+    box-shadow: none;
+  }
+
+  &__image-wrapper {
+    position: relative;
+    padding-top: 66.67%;
+    overflow: hidden;
+  }
+
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__content {
+    padding: 16px;
+
+    .tour-card--detail & {
+      padding: 20px;
+    }
+  }
+
+  &__hotel-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    line-height: 1.3;
+
+    .tour-card--detail & {
+      font-size: 20px;
+    }
+  }
+
+  &__location {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+
+    .tour-card--detail & {
+      font-size: 15px;
+    }
+  }
+
+  &__dates {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  &__date-label {
+    color: #888;
+  }
+
+  &__date-value {
+    color: #333;
+    font-weight: 500;
+  }
+
+  &__price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0066cc;
+    margin-top: 12px;
+
+    .tour-card--detail & {
+      font-size: 24px;
+    }
+  }
+
+  &__link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #0066cc;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 637px) {
+  .tour-card {
+    max-width: 100%;
+  }
+}
