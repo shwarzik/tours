@@ -1,11 +1,11 @@
-import React from "react";
+import { SVGProps } from "react";
 
-type Props = React.SVGProps<SVGSVGElement> & {
+type Props = SVGProps<SVGSVGElement> & {
   size?: number | string;
   strokeWidth?: number;
 };
 
-export const Close: React.FC<Props> = ({ size = 24, strokeWidth = 2, className, ...props }) => (
+export const ErrorIcon = ({ size = 24, strokeWidth = 2, ...props }: Props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -16,10 +16,10 @@ export const Close: React.FC<Props> = ({ size = 24, strokeWidth = 2, className, 
     strokeWidth={strokeWidth}
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={className ?? ""}
     {...props}
   >
-    <path d="M18 6 L6 18" />
-    <path d="M6 6 L18 18" />
+    <circle cx="12" cy="12" r="10" />
+    <path d="m15 9-6 6" />
+    <path d="m9 9 6 6" />
   </svg>
 );

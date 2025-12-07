@@ -1,16 +1,13 @@
-import { Routes, Route } from 'react-router-dom'
-import { HomePage, TourPage } from '@/pages'
-import '@/App.css'
+import { Routes, Route } from "react-router-dom";
+import { HomePage, TourPage } from "@/pages";
 
 function App() {
   return (
-      <div className="app">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/tour/:priceId/:hotelId" element={<TourPage />} />
-        </Routes>
-      </div>
-  )
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/tour/:priceId/:hotelId" element={<TourPage />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

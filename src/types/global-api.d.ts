@@ -1,5 +1,3 @@
-import type { CountriesMap, HotelsMap, PriceOffer } from "./api";
-
 declare module "/api.js" {
   export function getCountries(): Promise<Response>;
   export function searchGeo(query?: string): Promise<Response>;

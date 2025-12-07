@@ -1,32 +1,25 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
-const queryCache = new Map<string, { data: any; timestamp: number }>();
+const queryCache = new Map<string, { data: unknown; timestamp: number }>();
 
 interface QueryOptions<T> {
   key: string;
   queryFn: () => Promise<T>;
   retry?: number;
   retryDelay?: number;
-  staleTime?: number;
   enabled?: boolean;
 }
 
-export function useSmartQuery<T>({
-  key,
-  queryFn,
-  retry = 3,
-  retryDelay = 500,
-  staleTime = 10000,
-  enabled = true,
-}: QueryOptions<T>) {
+export function useFetch<T>({ key, queryFn, retry = 2, retryDelay = 500, enabled = true }: QueryOptions<T>) {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(enabled);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const retriesLeft = useRef(retry);
 
   const refetch = () => {
     retriesLeft.current = retry;
+
     return execute();
   };
 
@@ -36,15 +29,18 @@ export function useSmartQuery<T>({
 
     const cached = queryCache.get(key);
 
-    if (cached && Date.now() - cached.timestamp < staleTime) {
-      setData(cached.data);
+    if (cached) {
+      console.log(`USING CACHED DATA FOR KEY="${key}"`);
+      setData(cached.data as T);
       setIsLoading(false);
-      return cached.data;
+      return cached.data as T;
     }
 
-    const run = async (): Promise<T> => {
+    const run = async (attempt = 1): Promise<T> => {
       try {
         const result = await queryFn();
+
+        console.log(`FETCHED FRESH DATA FOR KEY="${key}"`);
 
         queryCache.set(key, {
           data: result,
@@ -55,9 +51,13 @@ export function useSmartQuery<T>({
         return result;
       } catch (err) {
         if (retriesLeft.current > 0) {
+          console.warn(
+            `fetch failed for key="${key}" on attempt ${attempt};`,
+            err
+          );
           retriesLeft.current--;
           await new Promise((res) => setTimeout(res, retryDelay));
-          return run();
+          return run(attempt + 1);
         }
         throw err;
       }
@@ -68,12 +68,12 @@ export function useSmartQuery<T>({
       setData(result);
       return result;
     } catch (err) {
-      setError(err);
+      setError(err as Error);
       throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [key, queryFn, staleTime, retryDelay]);
+  }, [key, queryFn, retryDelay]);
 
   useEffect(() => {
     if (!enabled) return;

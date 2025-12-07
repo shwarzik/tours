@@ -1,18 +1,18 @@
 import { ChangeEvent, InputHTMLAttributes, RefObject } from "react";
-import { Button } from "@/components";
-import { Close } from "@/icons";
 
-import "./Input.css";
+import { CloseIcon } from "@/icons";
+import { Button } from "@/components";
+
+import "./Input.scss";
 
 type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> & {
   onChange: (value: string) => void;
-  onFocus: () => void;
   value: string;
   label?: string;
   inputRef: RefObject<HTMLInputElement | null>;
 };
 
-export function Input({ value, inputRef, label, onChange, onFocus, ...props }: InputProps) {
+export function Input({ value, inputRef, label, onChange, ...props }: InputProps) {
   const handleClear = () => {
     onChange("");
     inputRef.current?.focus();
@@ -28,13 +28,12 @@ export function Input({ value, inputRef, label, onChange, onFocus, ...props }: I
           className="input__field"
           value={value}
           onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-          onFocus={onFocus}
           {...props}
         />
 
         {value && (
           <Button type="button" variant="icon" className="input__close-icon" onClick={handleClear}>
-            <Close size={16} />
+            <CloseIcon size={16} />
           </Button>
         )}
       </div>

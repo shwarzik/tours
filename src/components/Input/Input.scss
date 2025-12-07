@@ -1,0 +1,41 @@
+.input__wrapper {
+  position: relative;
+}
+
+.input {
+  &__label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__field {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #0066cc;
+    }
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+
+  &__close-icon {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+}
