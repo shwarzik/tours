@@ -2,10 +2,10 @@ import { FormEvent, useEffect, useLayoutEffect, useRef } from "react";
 
 import { getStartSearchPrices } from "@/api/endpoints";
 import { useFetch } from "@/hooks/useFetch";
-import { filterOffersBySelection, mergeOffersWithHotels } from "@/utils";
 import { LocationItems } from "@/types/location";
 import { SearchForm, SearchResults } from "@/components";
 import { useSearch } from "@/context/SearchContext";
+import { filterOffersBySelection, mergeOffersWithHotels } from "@/utils/search";
 
 import "./HomePage.scss";
 
@@ -36,13 +36,6 @@ export function HomePage() {
     });
   };
 
-  useLayoutEffect(() => {
-    if (!countryId) return;
-    submittedItemIdRef.current = countryId;
-    refetchOffers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const mergedOffers = mergeOffersWithHotels(offersData?.prices ?? {}, offersData?.hotels ?? {});
   const submittedItemId = submittedItemIdRef.current;
   const offers = offersData && submittedItemId ? filterOffersBySelection(mergedOffers, submittedItemId) : null;
@@ -51,6 +44,13 @@ export function HomePage() {
     if (!activeToken) return;
     stopOffers(activeToken);
   };
+
+  useLayoutEffect(() => {
+    if (!countryId) return;
+    submittedItemIdRef.current = countryId;
+    refetchOffers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setActiveToken(offersData?.activeToken || "");

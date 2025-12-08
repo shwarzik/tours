@@ -17,7 +17,10 @@
   }
 
   &__back-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     margin-bottom: 16px;
     font-size: 14px;
     color: #0066cc;
@@ -29,7 +32,8 @@
   }
 
   &__description {
-    padding: 20px;
+    margin-top: 20px;
+    padding-top: 20px;
     border-top: 1px solid #eee;
 
     h3 {
@@ -45,7 +49,8 @@
   }
 
   &__services {
-    padding: 20px;
+    margin-top: 20px;
+    padding-top: 20px;
     border-top: 1px solid #eee;
 
     h3 {
@@ -63,9 +68,13 @@
   }
 
   &__service-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     background: #f0f7ff;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 4px 12px;
+    border-radius: 10px;
     font-size: 14px;
     color: #333;
   }

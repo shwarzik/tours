@@ -8,8 +8,8 @@ import {
   getHotel as getHotelAPI,
   stopSearchPrices as stopSearchPricesAPI,
 } from "./api";
-import type { GeoEntity, HotelsMap, PricesMap, StartSearchResponse, PriceOffer, Hotel } from "@/types/api";
-import { rethrowResponseError } from "@/utils";
+import { rethrowResponseError } from "@/utils/search";
+import type { GeoEntity, StartSearchResponse, PriceOffer, Hotel } from "@/types/api";
 
 export const getCountries = async () => {
   try {
@@ -33,9 +33,7 @@ export const getSearch = async (query: string) => {
   }
 };
 
-export const getStartSearchPrices = async (
-  countryID: string,
-): Promise<{ prices: PricesMap; hotels: HotelsMap; activeToken: string }> => {
+export const getStartSearchPrices = async (countryID: string) => {
   try {
     const responseToken = await fetchStartSearchPrices(countryID);
     const tokenData: StartSearchResponse = await responseToken.json();
@@ -47,8 +45,8 @@ export const getStartSearchPrices = async (
 
     const responsePrices = await getSearchPrices(tokenData.token);
     const responseHotels = await getHotelsAPI(countryID);
-    const pricesData: { prices: PricesMap } = await responsePrices.json();
-    const hotelsData: HotelsMap = await responseHotels.json();
+    const pricesData = await responsePrices.json();
+    const hotelsData = await responseHotels.json();
 
     return { prices: pricesData.prices, hotels: hotelsData, activeToken: tokenData.token };
   } catch (error) {

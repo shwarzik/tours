@@ -4,7 +4,6 @@ export type LocationItems = {
   countryId: string | number;
   itemId: string | number;
   value?: string;
-  // type: "country" | "city" | "hotel";
 };
 
 export type Searchable = Partial<Pick<Hotel, "name" | "cityName" | "countryName">>;

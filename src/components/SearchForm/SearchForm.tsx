@@ -2,23 +2,22 @@ import { FormEvent, useState } from "react";
 
 import { getCountries, getSearch } from "@/api/endpoints";
 import { useFetch } from "@/hooks/useFetch";
+import { useSearch } from "@/context/SearchContext";
 import { GeoEntity } from "@/types/api";
-import { createLocationItem, findMatch, getIcon, getTypeLabel } from "@/utils";
 import { LocationItems } from "@/types/location";
+import { createLocationItem, findMatch } from "@/utils/search";
+import { getIcon, getTypeLabel } from "@/utils/labels";
 import { Button, Dropdown } from "@/components";
 
 import "./SearchForm.scss";
-import { useSearch } from "@/context/SearchContext";
 
-export function SearchForm({
-  isPricesLoading,
-  onSubmit,
-  onChangeStop,
-}: {
-  onSubmit: (e: FormEvent, selectedItem: LocationItems) => void;
+type SearchFormProps = {
   isPricesLoading: boolean;
+  onSubmit: (e: FormEvent, selectedItem: LocationItems) => void;
   onChangeStop?: () => void;
-}) {
+};
+
+export function SearchForm({ isPricesLoading, onSubmit, onChangeStop }: SearchFormProps) {
   const { selectedItem, setSelectedItem } = useSearch();
   const [inputValue, setInputValue] = useState(selectedItem.value || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -39,7 +38,7 @@ export function SearchForm({
   const matchedItems = findMatch<GeoEntity>(searchData ?? null, inputValue);
   const dropdownItems: GeoEntity[] = isGreaterThanTwoChars ? matchedItems : Object.values(countriesData ?? {});
 
-  const isLoading = isCountriesLoading || isSearchLoading;
+  const isLoading = isCountriesLoading || isSearchLoading || isPricesLoading;
   const phase = isLoading ? "loading" : dropdownItems.length === 0 ? "empty" : "done";
 
   const handleSelectItem = (item: GeoEntity) => {
@@ -92,7 +91,7 @@ export function SearchForm({
           })}
         </ul>
       </Dropdown>
-      <Button type="submit" disabled={isLoading || isPricesLoading}>
+      <Button type="submit" disabled={isLoading}>
         {isLoading ? "Пошук..." : "Знайти"}
       </Button>
     </form>

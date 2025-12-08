@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+
 import { stopSearchPrices } from "@/api/endpoints";
 
 // Simple in-memory cache keyed by a string. Values persist for the app lifetime.

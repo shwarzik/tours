@@ -1,33 +1,5 @@
-import { CityIcon, CountryIcon, HotelIcon } from "@/icons";
 import { GeoEntity, HotelsMap, PriceOffer } from "@/types/api";
 import { HotelOffer, LocationItems, Searchable } from "@/types/location";
-
-const iconMap = {
-  country: {
-    icon: CountryIcon,
-    name: "Країна",
-  },
-  city: {
-    icon: CityIcon,
-    name: "Місто",
-  },
-  hotel: {
-    icon: HotelIcon,
-    name: "Готель",
-  },
-} as const;
-
-export const phaseMapping = {
-  loading: "Завантаження...",
-  empty: "Нічого не знайдено",
-  done: "",
-};
-
-export const initialSelection: LocationItems = {
-  countryId: "",
-  itemId: "",
-  value: "",
-};
 
 // Create LocationItems from GeoEntity or fallback to raw input
 export function createLocationItem(item: GeoEntity | null, inputValue: string): LocationItems {
@@ -41,17 +13,6 @@ export function createLocationItem(item: GeoEntity | null, inputValue: string): 
     itemId: String(item.id),
     value: inputValue,
   };
-}
-
-export type IconName = keyof typeof iconMap;
-
-// For dropdown icons and similar UI elements
-export function getIcon(name: IconName) {
-  return iconMap[name]?.icon ?? null;
-}
-// For dropdown labels and similar UI elements
-export function getTypeLabel(name: IconName) {
-  return iconMap[name]?.name ?? null;
 }
 
 // Generic search function for GeoEntity-like records
@@ -114,15 +75,4 @@ export function filterOffersBySelection(offers: HotelOffer[], selectedId: string
       String(offer.countryId) === String(selectedId) ||
       String(offer.hotelID) === String(selectedId),
   );
-}
-
-// Get correct plural form for Ukrainian nouns based on count
-export function getPluralForm(count: number, one: string, few: string, many: string) {
-  const n = Math.abs(count) % 100;
-  const n1 = n % 10;
-
-  if (n > 10 && n < 20) return many;
-  if (n1 > 1 && n1 < 5) return few;
-  if (n1 === 1) return one;
-  return many;
 }

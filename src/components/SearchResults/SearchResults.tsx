@@ -1,8 +1,7 @@
-import { ResultMessage, Loader } from "@/components";
+import { ResultMessage, Loader, TourCard } from "@/components";
 import { HotelOffer } from "@/types/location";
 import { InfoIcon, ErrorIcon } from "@/icons";
-import { TourCard } from "../TourCard/TourCard";
-import { getPluralForm } from "@/utils";
+import { getPluralForm } from "@/utils/format";
 
 import "./SearchResults.scss";
 

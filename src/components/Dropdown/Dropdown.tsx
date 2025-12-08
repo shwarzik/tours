@@ -1,6 +1,6 @@
 import { InputHTMLAttributes, ReactNode, useEffect, useRef } from "react";
 
-import { phaseMapping } from "@/utils";
+import { phaseMapping } from "@/utils/labels";
 import { Input } from "@/components";
 
 import "./Dropdown.scss";

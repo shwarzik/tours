@@ -1,10 +1,9 @@
 import { Routes, Route } from "react-router-dom";
+
 import { HomePage, TourPage } from "@/pages";
 import { SearchProvider } from "@/context/SearchContext";
 
 function App() {
-   
-
   return (
     <SearchProvider>
       <Routes>

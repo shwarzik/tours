@@ -1,6 +1,7 @@
-import { LocationItems } from "@/types/location";
-import { initialSelection } from "@/utils";
 import { createContext, useContext, useState, ReactNode } from "react";
+
+import { LocationItems } from "@/types/location";
+import { initialSelection } from "@/utils/labels";
 
 type SearchContextType = {
   selectedItem: LocationItems;

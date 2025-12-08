@@ -1,22 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
+
 import { getHotel, getPrice } from "@/api/endpoints";
 import { useFetch } from "@/hooks/useFetch";
-import { TourCard } from "@/components";
+import { Loader, ResultMessage, TourCard } from "@/components";
+import { getIcon, getTypeLabel, IconLabel } from "@/utils/labels";
+import { InfoIcon, ArrowLeftIcon } from "@/icons";
 import { HotelOffer } from "@/types/location";
 
 import "./TourPage.scss";
-
-function getServiceLabel(key: string) {
-  const labels: Record<string, string> = {
-    wifi: '📶 Wi-Fi',
-    aquapark: '🏊 Аквапарк',
-    tennis_court: '🎾 Тенісний корт',
-    laundry: '🧺 Пральня',
-    parking: '🅿️ Парковка',
-  }
-  return labels[key] || key
-}
-
 
 export function TourPage() {
   const { pathname } = useLocation();
@@ -26,54 +17,86 @@ export function TourPage() {
   const { data: priceData, isLoading: isPriceLoading } = useFetch({
     key: `price-${priceId}`,
     queryFn: () => getPrice(String(priceId)),
-    enabled: priceId !== undefined,
+    enabled: !!priceId,
   });
 
   const { data: hotelData, isLoading: isHotelLoading } = useFetch({
     key: `hotel-${hotelId}`,
     queryFn: () => getHotel(Number(hotelId)),
-    enabled: hotelId !== undefined,
+    enabled: !!hotelId,
   });
 
-  if (isPriceLoading || isHotelLoading) {
-    return <p>Loading tour details...</p>;
+  const isLoading = isPriceLoading || isHotelLoading;
+  const isDataExist = !priceData || !hotelData;
+
+  if (isLoading) {
+    return (
+      <div className="tour-page">
+        <Loader message="Завантаження..." />
+      </div>
+    );
   }
 
-  const tourData: HotelOffer | null = (() => {
-    if (!priceData || !hotelData) return null;
-    const { id: priceId, ...restPrice } = priceData;
-    return { ...hotelData, ...restPrice, priceId };
-  })();
-
-  if (!tourData) {
-    return <p>Не вдалося завантажити тур.</p>;
+  if (isDataExist) {
+    return (
+      <div className="results-message-wrapper">
+        <ResultMessage
+          icon={<InfoIcon size={50} color="#ffb116" />}
+          title="Результати відсутні"
+          message="Не вдалося завантажити тур."
+        />
+      </div>
+    );
   }
+
+  const { countryId, cityId, cityName, countryName, name, img, description, services } = hotelData;
+  const { startDate, endDate, amount, currency } = priceData;
+  const tourData: HotelOffer = {
+    id: Number(priceData.id),
+    priceId: String(priceData.id),
+    name,
+    countryName,
+    cityName,
+    cityId,
+    countryId,
+    img,
+    description,
+    services,
+    startDate,
+    endDate,
+    amount,
+    currency,
+  };
 
   return (
     <div className="tour-page">
       <Link to="/" className="tour-page__back-link">
-        ← Повернутися до пошуку
+        <ArrowLeftIcon /> Повернутися до пошуку
       </Link>
-      <h1 className="tour-page__title">Тур</h1>
+      <h1 className="tour-page__title">Деталі туру</h1>
       <TourCard tour={tourData}>
-        {tourData.description && (
+        {description && (
           <div className="tour-page__description">
             <h3>Про готель</h3>
-            <p>{tourData.description}</p>
+            <p>{description}</p>
           </div>
         )}
-
-        {tourData.services && (
+        {services && (
           <div className="tour-page__services">
-            <h3>Зручності</h3>
+            <h3>Сервіси</h3>
             <ul className="tour-page__services-list">
-              {Object.entries(tourData.services).map(([key, value]) =>
-                value === "yes" ? (
-                  <li key={key} className="tour-page__service-item">
-                    {getServiceLabel(key)}
-                  </li>
-                ) : null,
-              )}
+              {Object.entries(services).map(([key, value]) => {
+                const Icon = getIcon(key as IconLabel);
+                const label = getTypeLabel(key as IconLabel);
+                return (
+                  value === "yes" && (
+                    <li key={key} className="tour-page__service-item">
+                      <Icon size={20} color="grey" />
+                      {label}
+                    </li>
+                  )
+                );
+              })}
             </ul>
           </div>
         )}
