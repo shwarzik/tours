@@ -15,27 +15,35 @@ interface QueryOptions<T> {
   enabled?: boolean;
 }
 
+interface RefetchOptions<T> {
+  key?: string;
+  queryFn?: () => Promise<T>;
+}
+
 export function useFetch<T>({ key, queryFn, retry = 2, retryDelay = 500, enabled = true }: QueryOptions<T>) {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState<Error | null>(null);
 
   const retriesLeft = useRef(retry);
+  const keyRef = useRef(key);
+  const queryFnRef = useRef(queryFn);
 
-  const refetch = () => {
-    retriesLeft.current = retry;
+  // Keep refs updated
+  keyRef.current = key;
+  queryFnRef.current = queryFn;
 
-    return execute();
-  };
+  const execute = useCallback(async (options?: RefetchOptions<T>) => {
+    const currentKey = options?.key ?? keyRef.current;
+    const currentQueryFn = options?.queryFn ?? queryFnRef.current;
 
-  const execute = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
-    const cached = queryCache.get(key);
+    const cached = queryCache.get(currentKey);
 
     if (cached) {
-      console.log(`USING CACHED DATA FOR KEY="${key}"`);
+      console.log(`USING CACHED DATA FOR KEY="${currentKey}"`);
       setData(cached.data as T);
       setIsLoading(false);
       return cached.data as T;
@@ -43,11 +51,11 @@ export function useFetch<T>({ key, queryFn, retry = 2, retryDelay = 500, enabled
 
     const run = async (attempt = 1): Promise<T> => {
       try {
-        const result = await queryFn();
+        const result = await currentQueryFn();
 
-        console.log(`FETCHED FRESH DATA FOR KEY="${key}"`);
+        console.log(`FETCHED FRESH DATA FOR KEY="${currentKey}"`);
 
-        queryCache.set(key, {
+        queryCache.set(currentKey, {
           data: result,
           timestamp: Date.now(),
         });
@@ -57,7 +65,7 @@ export function useFetch<T>({ key, queryFn, retry = 2, retryDelay = 500, enabled
       } catch (err) {
         if (retriesLeft.current > 0) {
           console.warn(
-            `fetch failed for key="${key}" on attempt ${attempt};`,
+            `fetch failed for key="${currentKey}" on attempt ${attempt};`,
             err
           );
           retriesLeft.current--;
@@ -78,7 +86,12 @@ export function useFetch<T>({ key, queryFn, retry = 2, retryDelay = 500, enabled
     } finally {
       setIsLoading(false);
     }
-  }, [key, queryFn, retryDelay]);
+  }, [retryDelay]);
+
+  const refetch = useCallback((options?: RefetchOptions<T>) => {
+    retriesLeft.current = retry;
+    return execute(options);
+  }, [execute, retry]);
 
   useEffect(() => {
     if (!enabled) return;

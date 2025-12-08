@@ -1,17 +1,17 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useLayoutEffect, useRef } from "react";
 
 import { getStartSearchPrices } from "@/api/endpoints";
-import { HotelsMap, PricesMap } from "@/types/api";
-import { LocationItems } from "@/types/location";
 import { useFetch } from "@/hooks/useFetch";
-import { filterOffersBySelection, initialSelection, mergeOffersWithHotels } from "@/utils";
+import { filterOffersBySelection, mergeOffersWithHotels } from "@/utils";
+import { LocationItems } from "@/types/location";
 import { SearchForm, SearchResults } from "@/components";
+import { useSearch } from "@/context/SearchContext";
 
 import "./HomePage.scss";
 
 export function HomePage() {
-  const [selectedItem, setSelectedItem] = useState<LocationItems>(initialSelection);
-  const [submittedItemId, setSubmittedItemId] = useState<string | number>(initialSelection.itemId);
+  const { selectedItem, setSelectedItem } = useSearch();
+  const submittedItemIdRef = useRef<string | number>("");
   const { countryId } = selectedItem;
 
   const {
@@ -19,21 +19,33 @@ export function HomePage() {
     isLoading: isOffersLoading,
     refetch: refetchOffers,
     error: offersError,
-  } = useFetch<{ prices: PricesMap; hotels: HotelsMap }>({
+  } = useFetch({
     key: `prices-${countryId}`,
     queryFn: () => getStartSearchPrices(String(countryId)),
     enabled: false,
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent, item: LocationItems) => {
     e.preventDefault();
-    setSubmittedItemId(selectedItem.itemId);
-    refetchOffers();
+    const value = item.value ? item.countryId : "";
+    submittedItemIdRef.current = item.itemId;
+    refetchOffers({
+      key: `prices-${value}`,
+      queryFn: () => getStartSearchPrices(String(value)),
+    });
   };
-  
+
+  useLayoutEffect(() => {
+    if (!countryId) return;
+    submittedItemIdRef.current = countryId;
+    refetchOffers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const mergedOffers = mergeOffersWithHotels(offersData?.prices ?? {}, offersData?.hotels ?? {});
-  const offers = offersData ? filterOffersBySelection(mergedOffers, submittedItemId) : null;
-  
+  const submittedItemId = submittedItemIdRef.current;
+  const offers = offersData && submittedItemId ? filterOffersBySelection(mergedOffers, submittedItemId) : null;
+
   return (
     <div className="home-page">
       <h1 className="home-page__title">Пошук турів</h1>

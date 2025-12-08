@@ -4,10 +4,10 @@ import "./TourCard.scss";
 
 type TourCardProps = {
   tour: HotelOffer;
-  isDetailView?: boolean;
+  children?: React.ReactNode;
 };
 
-export function TourCard({ tour, isDetailView = false }: TourCardProps) {
+export function TourCard({ tour, children}: TourCardProps) {
   const formatPrice = (amount: number, currency: string) => {
     const currencySymbols: Record<string, string> = {
       usd: "$",
@@ -28,10 +28,10 @@ export function TourCard({ tour, isDetailView = false }: TourCardProps) {
     });
   };
 
-  const CardWrapper: React.ElementType = isDetailView ? "div" : "article";
+  const CardWrapper: React.ElementType = children ? "div" : "article";
 
   return (
-    <CardWrapper className={`tour-card ${isDetailView ? "tour-card--detail" : ""}`}>
+    <CardWrapper className={`tour-card ${children ? "tour-card--detail" : ""}`}>
       {tour.img && (
         <div className="tour-card__image-wrapper">
           <img src={tour.img} alt={tour?.name} className="tour-card__image" />
@@ -52,17 +52,19 @@ export function TourCard({ tour, isDetailView = false }: TourCardProps) {
           <span className="tour-card__date-value">{formatDate(tour.startDate)}</span>
         </div>
 
-        {isDetailView && (
+        {children && (
           <div className="tour-card__dates">
             <span className="tour-card__date-label">Дата завершення:</span>
             <span className="tour-card__date-value">{formatDate(tour.endDate)}</span>
           </div>
         )}
 
+        {children}
+
         <div className="tour-card__price">{formatPrice(tour.amount, tour.currency)}</div>
 
-        {!isDetailView && (
-          <Link to={`/tour/${tour.id}/${tour.priceId}`} className="tour-card__link">
+        {!children && (
+          <Link to={`/tour/${tour.hotelID}/${tour.priceId}`} className="tour-card__link">
             Відкрити ціну →
           </Link>
         )}

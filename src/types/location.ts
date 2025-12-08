@@ -3,7 +3,8 @@ import { Hotel, PriceOffer } from "./api";
 export type LocationItems = {
   countryId: string | number;
   itemId: string | number;
-  type: "country" | "city" | "hotel";
+  value?: string;
+  // type: "country" | "city" | "hotel";
 };
 
 export type Searchable = Partial<Pick<Hotel, "name" | "cityName" | "countryName">>;

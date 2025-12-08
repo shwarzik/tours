@@ -1,9 +1,9 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 
 import { getCountries, getSearch } from "@/api/endpoints";
 import { useFetch } from "@/hooks/useFetch";
 import { GeoEntity } from "@/types/api";
-import { findMatch, getIcon, getTypeLabel, initialSelection } from "@/utils";
+import { createLocationItem, findMatch, getIcon, getTypeLabel } from "@/utils";
 import { LocationItems } from "@/types/location";
 import { Button, Dropdown } from "@/components";
 
@@ -11,18 +11,17 @@ import "./SearchForm.scss";
 
 export function SearchForm({
   isPricesLoading,
-  selectedItem,
   setSelectedItem,
+  selectedItem,
   onSubmit,
 }: {
-  selectedItem: LocationItems;
   setSelectedItem: (selectedItem: LocationItems) => void;
-  onSubmit: (e: FormEvent) => void;
+  selectedItem: LocationItems;
+  onSubmit: (e: FormEvent, selectedItem: LocationItems) => void;
   isPricesLoading: boolean;
 }) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(selectedItem.value || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const selectionUpdateRef = useRef(false);
 
   const isGreaterThanTwoChars = inputValue.length > 2;
   const { data: countriesData, isLoading: isCountriesLoading } = useFetch({
@@ -37,40 +36,31 @@ export function SearchForm({
     enabled: isGreaterThanTwoChars,
   });
 
+  const matchedItems = findMatch<GeoEntity>(searchData ?? null, inputValue);
+  const dropdownItems: GeoEntity[] = isGreaterThanTwoChars ? matchedItems : Object.values(countriesData ?? {});
+
+  const isLoading = isCountriesLoading || isSearchLoading;
+  const phase = isLoading ? "loading" : dropdownItems.length === 0 ? "empty" : "done";
+
   const handleSelectItem = (item: GeoEntity) => {
-    const isCountry = "flag" in item;
-    selectionUpdateRef.current = true;
     setInputValue(item.name);
+    const isCountry = "flag" in item;
     setSelectedItem({
       countryId: isCountry ? item.id : item.countryId,
-      itemId: item.id,
-      type: isCountry ? "country" : item.type,
+      itemId: String(item.id),
     });
     setIsDropdownOpen(false);
   };
 
-  const matchedItems = findMatch<GeoEntity>(searchData ?? null, inputValue);
-
-  const shouldShowAllCountries = !isGreaterThanTwoChars || Boolean(countriesData?.[selectedItem.itemId]);
-
-  const dropdownItems: GeoEntity[] = shouldShowAllCountries
-    ? Object.values(countriesData ?? {})
-    : matchedItems;
-  const isLoading = isCountriesLoading || isSearchLoading;
-  const phase = isLoading ? "loading" : dropdownItems.length === 0 ? "empty" : "done";
-
-  // Reset selection when the user types manually (not when picking from the list)
-  useEffect(() => {
-    if (selectionUpdateRef.current) {
-      selectionUpdateRef.current = false;
-      return;
-    }
-
-    setSelectedItem({...initialSelection, countryId: inputValue});
-  }, [inputValue, setSelectedItem]);
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const newSelectedItem = createLocationItem(dropdownItems[0] ?? null, inputValue);
+    setSelectedItem(newSelectedItem);
+    onSubmit(e, newSelectedItem);
+  };
 
   return (
-    <form className="search-form" onSubmit={onSubmit}>
+    <form className="search-form" onSubmit={handleSubmit}>
       <Dropdown
         value={inputValue}
         onChange={(value) => setInputValue(value)}

@@ -1,5 +1,5 @@
 import { CityIcon, CountryIcon, HotelIcon } from "@/icons";
-import { HotelsMap, PriceOffer } from "@/types/api";
+import { GeoEntity, HotelsMap, PriceOffer } from "@/types/api";
 import { HotelOffer, LocationItems, Searchable } from "@/types/location";
 
 const iconMap = {
@@ -26,8 +26,22 @@ export const phaseMapping = {
 export const initialSelection: LocationItems = {
   countryId: "",
   itemId: "",
-  type: "country",
+  value: "",
 };
+
+// Create LocationItems from GeoEntity or fallback to raw input
+export function createLocationItem(item: GeoEntity | null, inputValue: string): LocationItems {
+  if (!item) {
+    return { countryId: inputValue, itemId: inputValue, value: inputValue };
+  }
+
+  const isCountry = "flag" in item;
+  return {
+    countryId: isCountry ? item.id : item.countryId,
+    itemId: String(item.id),
+    value: inputValue,
+  };
+}
 
 export type IconName = keyof typeof iconMap;
 
@@ -95,7 +109,10 @@ export function mergeOffersWithHotels(prices: Record<string, PriceOffer>, hotels
 // Filter offers by selected id; returns empty array if none match
 export function filterOffersBySelection(offers: HotelOffer[], selectedId: string | number): HotelOffer[] {
   return offers.filter(
-    (offer) => offer.cityId === selectedId || offer.countryId === selectedId || offer.hotelID === selectedId,
+    (offer) =>
+      String(offer.cityId) === String(selectedId) ||
+      String(offer.countryId) === String(selectedId) ||
+      String(offer.hotelID) === String(selectedId),
   );
 }
 
@@ -109,4 +126,3 @@ export function getPluralForm(count: number, one: string, few: string, many: str
   if (n1 === 1) return one;
   return many;
 }
-
