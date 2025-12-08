@@ -68,11 +68,17 @@ export function mergeOffersWithHotels(prices: Record<string, PriceOffer>, hotels
 }
 
 // Filter offers by selected id; returns empty array if none match
-export function filterOffersBySelection(offers: HotelOffer[], selectedId: string | number): HotelOffer[] {
-  return offers.filter(
+export function getFilteredAndSortedOffers(
+  offers: HotelOffer[],
+  selectedId: string | number
+): HotelOffer[] {
+  const filtered = offers.filter(
     (offer) =>
       String(offer.cityId) === String(selectedId) ||
       String(offer.countryId) === String(selectedId) ||
-      String(offer.hotelID) === String(selectedId),
+      String(offer.hotelID) === String(selectedId)
   );
+
+  // sort by amount (ascending)
+  return filtered.sort((a, b) => (a.amount ?? 0) - (b.amount ?? 0));
 }

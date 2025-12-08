@@ -35,8 +35,10 @@ export function SearchForm({ isPricesLoading, onSubmit, onChangeStop }: SearchFo
     enabled: isGreaterThanTwoChars,
   });
 
+  const countriesArray = Object.values(countriesData ?? {});
+  const isCountry = countriesArray.find((c) => c.name.toLowerCase() === inputValue.toLowerCase());
   const matchedItems = findMatch<GeoEntity>(searchData ?? null, inputValue);
-  const dropdownItems: GeoEntity[] = isGreaterThanTwoChars ? matchedItems : Object.values(countriesData ?? {});
+  const dropdownItems: GeoEntity[] = isGreaterThanTwoChars && !isCountry ? matchedItems : countriesArray;
 
   const isLoading = isCountriesLoading || isSearchLoading || isPricesLoading;
   const phase = isLoading ? "loading" : dropdownItems.length === 0 ? "empty" : "done";
@@ -53,7 +55,7 @@ export function SearchForm({ isPricesLoading, onSubmit, onChangeStop }: SearchFo
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const newSelectedItem = createLocationItem(dropdownItems[0] ?? null, inputValue);
+    const newSelectedItem = createLocationItem(matchedItems[0] ?? null, inputValue);
     setSelectedItem(newSelectedItem);
     onSubmit(e, newSelectedItem);
   };

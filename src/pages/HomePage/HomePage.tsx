@@ -5,7 +5,7 @@ import { useFetch } from "@/hooks/useFetch";
 import { LocationItems } from "@/types/location";
 import { SearchForm, SearchResults } from "@/components";
 import { useSearch } from "@/context/SearchContext";
-import { filterOffersBySelection, mergeOffersWithHotels } from "@/utils/search";
+import { getFilteredAndSortedOffers, mergeOffersWithHotels } from "@/utils/search";
 
 import "./HomePage.scss";
 
@@ -38,7 +38,7 @@ export function HomePage() {
 
   const mergedOffers = mergeOffersWithHotels(offersData?.prices ?? {}, offersData?.hotels ?? {});
   const submittedItemId = submittedItemIdRef.current;
-  const offers = offersData && submittedItemId ? filterOffersBySelection(mergedOffers, submittedItemId) : null;
+  const offers = offersData && submittedItemId ? getFilteredAndSortedOffers(mergedOffers, submittedItemId) : null;
 
   const handleStop = () => {
     if (!activeToken) return;
