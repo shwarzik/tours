@@ -1,4 +1,4 @@
-import { FormEvent, useLayoutEffect, useRef } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useRef } from "react";
 
 import { getStartSearchPrices } from "@/api/endpoints";
 import { useFetch } from "@/hooks/useFetch";
@@ -10,7 +10,7 @@ import { useSearch } from "@/context/SearchContext";
 import "./HomePage.scss";
 
 export function HomePage() {
-  const { selectedItem, setSelectedItem } = useSearch();
+  const { selectedItem, activeToken, setActiveToken } = useSearch();
   const submittedItemIdRef = useRef<string | number>("");
   const { countryId } = selectedItem;
 
@@ -19,6 +19,7 @@ export function HomePage() {
     isLoading: isOffersLoading,
     refetch: refetchOffers,
     error: offersError,
+    stop: stopOffers,
   } = useFetch({
     key: `prices-${countryId}`,
     queryFn: () => getStartSearchPrices(String(countryId)),
@@ -46,15 +47,19 @@ export function HomePage() {
   const submittedItemId = submittedItemIdRef.current;
   const offers = offersData && submittedItemId ? filterOffersBySelection(mergedOffers, submittedItemId) : null;
 
+  const handleStop = () => {
+    if (!activeToken) return;
+    stopOffers(activeToken);
+  };
+
+  useEffect(() => {
+    setActiveToken(offersData?.activeToken || "");
+  }, [offersData?.activeToken, setActiveToken]);
+
   return (
     <div className="home-page">
       <h1 className="home-page__title">Пошук турів</h1>
-      <SearchForm
-        setSelectedItem={setSelectedItem}
-        selectedItem={selectedItem}
-        onSubmit={handleSubmit}
-        isPricesLoading={isOffersLoading}
-      />
+      <SearchForm onSubmit={handleSubmit} isPricesLoading={isOffersLoading} onChangeStop={handleStop} />
       <SearchResults offers={offers} loading={isOffersLoading} error={offersError} />
     </div>
   );

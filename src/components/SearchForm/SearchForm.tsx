@@ -8,18 +8,18 @@ import { LocationItems } from "@/types/location";
 import { Button, Dropdown } from "@/components";
 
 import "./SearchForm.scss";
+import { useSearch } from "@/context/SearchContext";
 
 export function SearchForm({
   isPricesLoading,
-  setSelectedItem,
-  selectedItem,
   onSubmit,
+  onChangeStop,
 }: {
-  setSelectedItem: (selectedItem: LocationItems) => void;
-  selectedItem: LocationItems;
   onSubmit: (e: FormEvent, selectedItem: LocationItems) => void;
   isPricesLoading: boolean;
+  onChangeStop?: () => void;
 }) {
+  const { selectedItem, setSelectedItem } = useSearch();
   const [inputValue, setInputValue] = useState(selectedItem.value || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -63,7 +63,10 @@ export function SearchForm({
     <form className="search-form" onSubmit={handleSubmit}>
       <Dropdown
         value={inputValue}
-        onChange={(value) => setInputValue(value)}
+        onChange={(value) => {
+          onChangeStop?.();
+          setInputValue(value);
+        }}
         isDropdownOpen={isDropdownOpen}
         setIsDropdownOpen={setIsDropdownOpen}
         phase={phase}

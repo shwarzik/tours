@@ -6,6 +6,7 @@ import {
   getHotels as getHotelsAPI,
   getPrice as getPriceAPI,
   getHotel as getHotelAPI,
+  stopSearchPrices as stopSearchPricesAPI,
 } from "./api";
 import type { GeoEntity, HotelsMap, PricesMap, StartSearchResponse, PriceOffer, Hotel } from "@/types/api";
 import { rethrowResponseError } from "@/utils";
@@ -32,7 +33,9 @@ export const getSearch = async (query: string) => {
   }
 };
 
-export const getStartSearchPrices = async (countryID: string): Promise<{ prices: PricesMap; hotels: HotelsMap }> => {
+export const getStartSearchPrices = async (
+  countryID: string,
+): Promise<{ prices: PricesMap; hotels: HotelsMap; activeToken: string }> => {
   try {
     const responseToken = await fetchStartSearchPrices(countryID);
     const tokenData: StartSearchResponse = await responseToken.json();
@@ -47,10 +50,9 @@ export const getStartSearchPrices = async (countryID: string): Promise<{ prices:
     const pricesData: { prices: PricesMap } = await responsePrices.json();
     const hotelsData: HotelsMap = await responseHotels.json();
 
-    return { prices: pricesData.prices, hotels: hotelsData };
+    return { prices: pricesData.prices, hotels: hotelsData, activeToken: tokenData.token };
   } catch (error) {
     await rethrowResponseError(error, "Failed to load start search tokens.");
-    // rethrowResponseError always throws; this return satisfies TypeScript
     throw new Error("Unreachable");
   }
 };
@@ -75,6 +77,18 @@ export const getHotel = async (id: number): Promise<Hotel | null> => {
     return data as Hotel;
   } catch (error) {
     await rethrowResponseError(error, "Failed to load hotel data.");
+    return null;
+  }
+};
+
+export const stopSearchPrices = async (activeToken: string) => {
+  try {
+    const response = await stopSearchPricesAPI(activeToken);
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    await rethrowResponseError(error, "Failed to load stop search prices data.");
     return null;
   }
 };
