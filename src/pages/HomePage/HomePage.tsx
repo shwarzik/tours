@@ -11,8 +11,10 @@ import "./HomePage.scss";
 
 export function HomePage() {
   const { selectedItem } = useSearch();
-  const { countryId } = selectedItem;
+  const { countryId, itemId, isCountry } = selectedItem;
   const submittedItemIdRef = useRef<string | number | null>(null);
+
+  const contrySuffix = isCountry ? "-country" : "";
 
   const {
     data: offersData,
@@ -21,7 +23,7 @@ export function HomePage() {
     error: offersError,
     stop: stopOffers,
   } = useFetch({
-    key: `prices-${countryId}`,
+    key: `prices-${countryId}${contrySuffix}`,
     queryFn: () => getStartSearchPrices(String(countryId)),
     enabled: false,
   });
@@ -29,9 +31,9 @@ export function HomePage() {
   const handleSubmit = (e: FormEvent, item: LocationItems) => {
     e.preventDefault();
     const value = item.value ? item.countryId : "";
-    submittedItemIdRef.current = item.itemId;
+    submittedItemIdRef.current = isCountry ? item.countryId : item.itemId;
     refetchOffers({
-      key: `prices-${value}`,
+      key: `prices-${value}${contrySuffix}`,
       queryFn: () => getStartSearchPrices(String(value)),
     });
   };
@@ -48,9 +50,9 @@ export function HomePage() {
 
   useLayoutEffect(() => {
     if (!countryId) return;
-    submittedItemIdRef.current = countryId;
+    submittedItemIdRef.current = isCountry ? countryId : itemId;
     refetchOffers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -30,7 +30,7 @@ export function SearchForm({ isPricesLoading, onSubmit, onChangeStop }: SearchFo
   });
 
   const { data: searchData, isLoading: isSearchLoading } = useFetch({
-    key: "search-countries",
+    key: `search-countries-${inputValue}`,
     queryFn: () => getSearch(inputValue),
     enabled: isGreaterThanTwoChars,
   });
@@ -49,15 +49,16 @@ export function SearchForm({ isPricesLoading, onSubmit, onChangeStop }: SearchFo
     setSelectedItem({
       countryId: isCountry ? item.id : item.countryId,
       itemId: String(item.id),
+      isCountry,
     });
     setIsDropdownOpen(false);
   };
-
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const newSelectedItem = createLocationItem(matchedItems[0] ?? null, inputValue);
-    setSelectedItem(newSelectedItem);
-    onSubmit(e, newSelectedItem);
+    const selectedValues = { ...newSelectedItem, isCountry: Boolean(isCountry) };
+    setSelectedItem(selectedValues);
+    onSubmit(e, selectedValues);
   };
 
   return (
