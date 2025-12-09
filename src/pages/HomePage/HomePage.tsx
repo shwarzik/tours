@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useLayoutEffect, useRef } from "react";
+import { FormEvent, useLayoutEffect, useRef } from "react";
 
 import { getStartSearchPrices } from "@/api/endpoints";
 import { useFetch } from "@/hooks/useFetch";
@@ -10,9 +10,9 @@ import { getFilteredAndSortedOffers, mergeOffersWithHotels } from "@/utils/searc
 import "./HomePage.scss";
 
 export function HomePage() {
-  const { selectedItem, activeToken, setActiveToken } = useSearch();
-  const submittedItemIdRef = useRef<string | number>("");
+  const { selectedItem } = useSearch();
   const { countryId } = selectedItem;
+  const submittedItemIdRef = useRef<string | number | null>(null);
 
   const {
     data: offersData,
@@ -41,20 +41,17 @@ export function HomePage() {
   const offers = offersData && submittedItemId ? getFilteredAndSortedOffers(mergedOffers, submittedItemId) : null;
 
   const handleStop = () => {
-    if (!activeToken) return;
-    stopOffers(activeToken);
+    const token = offersData?.activeToken;
+    if (!token) return;
+    stopOffers(token);
   };
 
   useLayoutEffect(() => {
     if (!countryId) return;
     submittedItemIdRef.current = countryId;
     refetchOffers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    setActiveToken(offersData?.activeToken || "");
-  }, [offersData?.activeToken, setActiveToken]);
 
   return (
     <div className="home-page">

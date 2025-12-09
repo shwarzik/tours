@@ -20,7 +20,6 @@ export function findMatch<T extends Searchable>(data: Record<string, T> | null |
   const normalized = query.trim().toLowerCase();
 
   if (!normalized) return [];
-
   if (!data) return [];
 
   const result: T[] = [];
@@ -28,11 +27,14 @@ export function findMatch<T extends Searchable>(data: Record<string, T> | null |
   for (const key in data) {
     const item = data[key];
 
-    const name = item.name?.toLowerCase() ?? "";
-    const cityName = item.cityName?.toLowerCase() ?? "";
-    const countryName = item.countryName?.toLowerCase() ?? "";
+    const values = Object.values(item as Record<string, unknown>);
+    const matches = values.some((value) => {
+      if (value === null || value === undefined) return false;
+      const str = String(value).toLowerCase();
+      return str.includes(normalized);
+    });
 
-    if (name.includes(normalized) || cityName.includes(normalized) || countryName.includes(normalized)) {
+    if (matches) {
       result.push(item);
     }
   }

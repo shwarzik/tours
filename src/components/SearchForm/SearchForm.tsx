@@ -35,9 +35,9 @@ export function SearchForm({ isPricesLoading, onSubmit, onChangeStop }: SearchFo
     enabled: isGreaterThanTwoChars,
   });
 
-  const countriesArray = Object.values(countriesData ?? {});
+  const countriesArray = Object.values(countriesData || {});
   const isCountry = countriesArray.find((c) => c.name.toLowerCase() === inputValue.toLowerCase());
-  const matchedItems = findMatch<GeoEntity>(searchData ?? null, inputValue);
+  const matchedItems = findMatch<GeoEntity>(searchData || null, inputValue);
   const dropdownItems: GeoEntity[] = isGreaterThanTwoChars && !isCountry ? matchedItems : countriesArray;
 
   const isLoading = isCountriesLoading || isSearchLoading || isPricesLoading;
